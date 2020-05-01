@@ -1,53 +1,55 @@
-# Sign in with Twitter sample
+# Sign in with Twitter - Ruby sample
 
-This is a minimal, ruby standalone web app to help you understand how to enable the users of your website to Sign in with their Twitter accounts.
+[![license](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://github.com/andypiper/TwitterDotNetCore/blob/master/LICENSE) [![Standard](https://img.shields.io/static/v1?label=Twitter%20API&message=v1.1&color=794BC4&style=flat&logo=Twitter)](https://developer.twitter.com/en/docs/api-reference-index)
 
-* built as a simple Sinatra web app
-* easy to install and play
+This is a minimal, Ruby standalone web app to help you understand how to implement Sign in with Twitter.
+
+* built as a Sinatra web app
+* simple to install and run
 * no dependency with external databases
 * uses simple_oauth gem to enable free choice of HTTP client
 * code comments linked to official Twitter docs
 
-## Getting started
+## Setup
 
-The requirement is to have ruby and bundler installed.
+The base requirement is to have Ruby and Bundler installed.
 
-1. Create an app at [dev.twitter.com/apps](https://dev.twitter.com/apps) with:
+1. Create an app at [developer.twitter.com/apps](https://developer.twitter.com/apps) with:
     * read and write permission
-    * callback set to http://dev.yoursite.com:4567/callback (add `127.0.0.1   dev.yoursite.com` entry to your local `/etc/hosts`)
+    * callback set to http://dev.yoursite.com:4567/callback
+      * note that this must be the correct URL for your app, as this is validated as part of the authentication process
     * Sign in with Twitter option checked
 2. Clone this repo
 3. Run `bundle install` to install dependencies
 4. Rename `config/twitter_oauth.yml.sample` to `config/twitter_oauth.yml`
-5. Fill `twitter_oauth.yml` with your app consumer key and consumer secret got at step 1
+5. Fill `twitter_oauth.yml` with your consumer key and consumer secret from step 1
 6. Optionally, change the var ACCOUNT_TO_FOLLOW in `app.rb` to set what account will be followed
-7. Run `sign_in_start` script
+7. Run the `sign_in_start` script
 8. Open http://dev.yoursite.com:4567 in your browser
 
 ## The web app
 
-This web app simply require the user to Sign in with Twitter to be able to access "awesome" features. The features provided are the ability to create a automatic follow to an account (see step 6 above) or just to check the logged user info, which are resources only available if users authorize your app to have access to it.
+This web app simply requires the user to Sign in with Twitter to be able to access "awesome" features. The features provided are the ability to follow an account (see step 6 above) or to display the logged-in user info, which is only available if users authorize your app to have access to it.
 
-**Please, take into account that this sample web app is intended only for educational purposes. I do not recommend to use it as is in production.**
+*This sample web app is intended for educational purposes, not for production.*
 
 ## The code
 
-This app code is full of comments explaining what's happening in high level and linking to the official docs. The signing in implementation is concentrated in `lib/twitter_sign_in.rb` file, and `app.rb` file implements the high level flow of authentication.
+The Ruby code contains comments explaining what is happening at each step, with links to the official developer docs. The sign-in implementation is primarily in the `lib/twitter_sign_in.rb` file, with the `app.rb` file implementing the high level flow of authentication.
 
-Data persistence is achieved with [Daybreak](http://propublica.github.io/daybreak/) gem and a default `db/signin.db` is used to store tokens and user info.
+Data persistence is achieved using the [Daybreak](http://propublica.github.io/daybreak/) gem, and a default `db/signin.db` is used to store tokens and user info.
 
-At frontend side, I tried to keep it simple and just used Twitter bootstrap. All views and layouts are in `views` folder.
-
-I built this app using ruby 2, but it may work in other versions as well. Let me know if you have any problems to use it.
+The front-end is built with Bootstrap, and all views and layouts are in the `views` folder.
 
 ## References
 
-* Official docs: https://dev.twitter.com/docs/auth/implementing-sign-twitter
-* Cheat-sheet in mind map format: https://www.mindmeister.com/351451507/sign-in-with-twitter
+* Twitter Developer documentation: https://developer.twitter.com/en/docs/basics/authentication/guides/log-in-with-twitter
 * Sinatra: http://www.sinatrarb.com/
 * Daybreak: http://propublica.github.io/daybreak
 * Simple oauth gem: https://github.com/laserlemon/simple_oauth
 
+### Credits
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lfcipriani/sign_in_with_twitter_sample/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
+Original version by Luis Cipriani
+https://twitter.com/lfcipriani
+https://github.com/lfcipriani/sign_in_with_twitter_sample

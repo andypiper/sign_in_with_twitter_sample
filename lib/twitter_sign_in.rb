@@ -1,7 +1,7 @@
 require "net/https"
 require "simple_oauth"
 
-# This class implements the requests that should 
+# This class implements the requests that should
 # be done to Twitter to be able to authenticate
 # users with Twitter credentials
 class TwitterSignIn
@@ -11,14 +11,14 @@ class TwitterSignIn
       @oauth = YAML.load_file(TWITTER)
     end
 
-    # See https://dev.twitter.com/docs/auth/implementing-sign-twitter (Step 1)
+    # See https://developer.twitter.com/en/docs/basics/authentication/guides/log-in-with-twitter (Step 1)
     def request_token
 
       # The request to get request tokens should only
       # use consumer key and consumer secret, no token
       # is necessary
       response = TwitterSignIn.request(
-        :post, 
+        :post,
         "https://api.twitter.com/oauth/request_token",
         {},
         @oauth
@@ -39,18 +39,18 @@ class TwitterSignIn
       return obj["oauth_token"]
     end
 
-    # See https://dev.twitter.com/docs/auth/implementing-sign-twitter (Step 2)
-    def authenticate_url(query) 
-      # The redirection need to be done with oauth_token
+    # See https://developer.twitter.com/en/docs/basics/authentication/guides/log-in-with-twitter (Step 2)
+    def authenticate_url(query)
+      # The redirection to be done with oauth_token
       # obtained in request_token request
       "https://api.twitter.com/oauth/authenticate?oauth_token=" + query
     end
 
-    # See https://dev.twitter.com/docs/auth/implementing-sign-twitter (Step 3)
+    # See https://developer.twitter.com/en/docs/basics/authentication/guides/log-in-with-twitter (Step 3)
     def access_token(oauth_token, oauth_verifier)
 
       # To request access token, you need to retrieve
-      # oauth_token and oauth_token_secret stored in 
+      # oauth_token and oauth_token_secret stored in
       # database
       db = Daybreak::DB.new DATABASE
       if dbtoken = db[oauth_token]
@@ -62,10 +62,10 @@ class TwitterSignIn
         oauth[:token] = oauth_token
         oauth[:token_secret] = dbtoken["oauth_token_secret"]
 
-        # oauth_verifier got in callback must 
+        # oauth_verifier got in callback must
         # to be passed as body param
         response = TwitterSignIn.request(
-          :post, 
+          :post,
           "https://api.twitter.com/oauth/access_token",
           {:oauth_verifier => oauth_verifier},
           oauth
@@ -90,10 +90,9 @@ class TwitterSignIn
       db.close
       return oauth_token
     end
-    
-    # This is a sample Twitter API request to 
-    # make usage of user Access Token
-    # See https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials
+
+    # This is a sample Twitter API request to make usage of user Access Token
+    # See https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials
     def verify_credentials(oauth_token)
       db = Daybreak::DB.new DATABASE
 
@@ -106,7 +105,7 @@ class TwitterSignIn
         oauth[:token_secret] = dbtoken["access_token_secret"]
 
         response = TwitterSignIn.request(
-          :get, 
+          :get,
           "https://api.twitter.com/1.1/account/verify_credentials.json",
           {},
           oauth
@@ -115,7 +114,7 @@ class TwitterSignIn
         user = JSON.parse(response.body)
 
         # Just saving user info to database
-        user.merge! dbtoken 
+        user.merge! dbtoken
         db.lock { db[user["screen_name"]] = user }
 
         result = user
@@ -132,7 +131,7 @@ class TwitterSignIn
     def request(method, uri, params, oauth)
       uri = URI.parse(uri.to_s)
 
-      # always use SSL, you are dealing with other users data
+      # always use SSL, you are dealing with other users' data
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       # uncomment line below for debug purposes
@@ -149,7 +148,7 @@ class TwitterSignIn
       # and you can assign it wherever you want
       # See https://github.com/laserlemon/simple_oauth
       req["Authorization"] = SimpleOAuth::Header.new(method, uri.to_s, params, oauth)
-      
+
       http.request(req)
     end
 

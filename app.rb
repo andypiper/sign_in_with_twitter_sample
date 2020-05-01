@@ -1,20 +1,24 @@
 # Base libs
 require "rubygems"
 require "sinatra"
+
 # Important libs
 require "json"
 require "uri"
 require "yaml"
 require "daybreak"
+
 # App libs
 require File.expand_path(File.dirname(__FILE__) + '/lib/twitter_sign_in')
+
 # Constants declarations
 DATABASE = File.expand_path(File.dirname(__FILE__) + '/db/signin.db')
 TWITTER  = File.expand_path(File.dirname(__FILE__) + "/config/twitter_oauth.yml")
+
 # This is used in awesome_features/follow route.
 # Put a user screen name that will be followed
 # by logged user when accessing this feature.
-ACCOUNT_TO_FOLLOW = "twitterapi"
+ACCOUNT_TO_FOLLOW = "twitterdev"
 
 # Configurations
 TwitterSignIn.configure
@@ -47,30 +51,30 @@ end
 
 get '/signin' do
   # After hitting Sign in link, first thing your app must do
-  # is to get a request token. 
-  # See https://dev.twitter.com/docs/auth/implementing-sign-twitter (Step 1)
+  # is to get a request token.
+  # See https://developer.twitter.com/en/docs/basics/authentication/guides/log-in-with-twitter (Step 1)
   token = TwitterSignIn.request_token
 
-  # With request token in hands, you will just redirect 
+  # With request token in hands, you will just redirect
   # the user to authenticate at Twitter
-  # See https://dev.twitter.com/docs/auth/implementing-sign-twitter (Step 2)
+  # See https://developer.twitter.com/en/docs/basics/authentication/guides/log-in-with-twitter (Step 2)
   redirect TwitterSignIn.authenticate_url(token)
 end
 
 # This callback will be called by user browser after
 # being redirect by Twitter with successful authentication
-# See https://dev.twitter.com/docs/auth/implementing-sign-twitter (end of Step 2)
+# See https://developer.twitter.com/en/docs/basics/authentication/guides/log-in-with-twitter (end of Step 2)
 get '/callback' do
 
   # Given that the user authorized us, we now
   # need to get its Access Token.
-  # See https://dev.twitter.com/docs/auth/implementing-sign-twitter (Step 3)
+  # See https://developer.twitter.com/en/docs/basics/authentication/guides/log-in-with-twitter (Step 3)
   token = TwitterSignIn.access_token(params["oauth_token"], params["oauth_verifier"])
 
   if token
     # Now that we have user Access Token, we can do requests
-    # to Twitter API in the name of him/her
-    # In this case, see https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials
+    # to Twitter API on their behalf
+    # In this case, see https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials
     user = TwitterSignIn.verify_credentials(token)
 
     # Creating user session
@@ -81,7 +85,7 @@ get '/callback' do
       :bio    => user["description"]
     }
   else
-    logger.info "User didn't authorized us"
+    logger.info "User didn't authorize the app"
   end
 
   @account = ACCOUNT_TO_FOLLOW
@@ -109,7 +113,7 @@ get '/awesome_features/follow' do
     erb :forbidden
   else
     # Below is a nice example of accessing Twitter API
-    
+
     # Getting logged user info in database
     db = Daybreak::DB.new DATABASE
     dbtoken = db[session[:user]]
@@ -122,10 +126,10 @@ get '/awesome_features/follow' do
     oauth[:token] = dbtoken["access_token"]
     oauth[:token_secret] = dbtoken["access_token_secret"]
 
-    # A POST request in https://dev.twitter.com/docs/api/1.1/post/friendships/create
+    # A POST request to https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-create
     # to make the logged user follow the ACCOUNT_TO_FOLLOW
     response = TwitterSignIn.request(
-      :post, 
+      :post,
       "https://api.twitter.com/1.1/friendships/create.json",
       {:screen_name => ACCOUNT_TO_FOLLOW},
       oauth
