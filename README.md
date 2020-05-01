@@ -51,5 +51,5 @@ The front-end is built with Bootstrap, and all views and layouts are in the `vie
 ### Credits
 
 Original version by Luis Cipriani
-https://twitter.com/lfcipriani
-https://github.com/lfcipriani/sign_in_with_twitter_sample
+* https://twitter.com/lfcipriani
+* https://github.com/lfcipriani/sign_in_with_twitter_sample
